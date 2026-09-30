@@ -1,0 +1,69 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: shortly-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: shortly
+      MYSQL_USER: shortly
+      MYSQL_PASSWORD: shortly
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+      - --sql-mode=STRICT_ALL_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ushortly", "-pshortly"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  redis:
+    image: redis:7-alpine
+    container_name: shortly-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6383:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  # The app itself, for testing the real container locally.
+  #
+  # Behind a profile so `make up` starts only the dependencies — day to day you
+  # want `make run` on the host, where a rebuild is two seconds.
+  #   make up-full   starts this too
+  app:
+    profiles: ["full"]
+    build: .
+    container_name: shortly-app
+    environment:
+      SHORTLY_ENV: dev
+      SHORTLY_HTTP_ADDR: ":8080"
+      # 18080 on the host, so the container can run alongside `make run` on 8080.
+      SHORTLY_BASE_URL: http://localhost:18080
+      # Inside the compose network the host is the service name, and the port is
+      # MySQL's real 3306 — the 3307 mapping only exists on your machine.
+      SHORTLY_DATABASE_DSN: "shortly:shortly@tcp(mysql:3306)/shortly?parseTime=true&loc=UTC&charset=utf8mb4&timeout=5s"
+      SHORTLY_REDIS_ADDR: redis:6379
+      SHORTLY_LOG_LEVEL: debug
+    ports:
+      - "18080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  mysqldata:
+  redisdata:

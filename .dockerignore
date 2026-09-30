@@ -1,0 +1,12 @@
+# Keep the build context small and never ship secrets into an image layer.
+.env
+.git
+.github
+bin/
+docs/
+scripts/
+*.md
+*.test
+*.out
+.DS_Store
+.claude/

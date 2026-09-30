@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shortly — links, shortened</title>
+<link rel="stylesheet" href="/static/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>">
+</head>
+<body>
+
+<div class="aurora" aria-hidden="true">
+  <span></span><span></span><span></span>
+</div>
+
+<header class="top">
+  <a class="brand" href="/">
+    <span class="brand-mark">◗</span>
+    <span class="brand-name">shortly</span>
+  </a>
+
+  <nav class="top-actions">
+    <div id="signed-out" class="hidden">
+      <button class="btn btn-ghost" data-auth-open="login">Sign in</button>
+      <button class="btn btn-solid" data-auth-open="register">Create account</button>
+    </div>
+    <div id="signed-in" class="hidden account">
+      <span class="avatar" id="avatar"></span>
+      <span class="account-email" id="account-email"></span>
+      <button class="btn btn-ghost" id="logout">Sign out</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="eyebrow">Go · MySQL · Redis</p>
+    <h1>Long links,<br><em>politely</em> shortened.</h1>
+    <p class="sub">Paste a URL. Get something you can actually say out loud.</p>
+
+    <form id="shorten-form" class="shortener" autocomplete="off">
+      <div class="field">
+        <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/>
+          <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>
+        </svg>
+        <input id="url-input" type="url" name="url" placeholder="https://example.com/a/very/long/path?with=params"
+               required spellcheck="false">
+        <button class="btn btn-solid btn-go" type="submit">
+          <span class="btn-label">Shorten</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p class="hint" id="shorten-hint">Works without an account — sign in to keep track of them.</p>
+    </form>
+
+    <div id="result" class="result hidden">
+      <div class="result-main">
+        <span class="result-label">Your link</span>
+        <a class="result-url" id="result-url" target="_blank" rel="noopener"></a>
+      </div>
+      <button class="btn btn-copy" id="result-copy">Copy</button>
+    </div>
+  </section>
+
+  <section id="dashboard" class="dashboard hidden">
+    <div class="dash-head">
+      <h2>Your links</h2>
+      <span class="count" id="link-count"></span>
+    </div>
+    <div id="link-list" class="link-list"></div>
+    <p id="empty-state" class="empty hidden">
+      Nothing here yet. Shorten something above and it will show up.
+    </p>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>Built with the Go standard library. No framework, no ORM.</span>
+</footer>
+
+<!-- Auth ------------------------------------------------------------------ -->
+<div id="auth-backdrop" class="backdrop hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <button class="modal-close" id="auth-close" aria-label="Close">×</button>
+
+    <h2 id="auth-title">Welcome back</h2>
+    <p class="modal-sub" id="auth-sub">Sign in to keep your links together.</p>
+
+    <form id="auth-form" autocomplete="off">
+      <label class="label" for="auth-email">Email</label>
+      <input class="input" id="auth-email" type="email" required placeholder="you@example.com">
+
+      <label class="label" for="auth-password">Password</label>
+      <input class="input" id="auth-password" type="password" required placeholder="at least 12 characters">
+      <p class="meter-wrap"><span class="meter" id="pw-meter"></span></p>
+
+      <p class="form-error hidden" id="auth-error"></p>
+
+      <button class="btn btn-solid btn-block" type="submit">
+        <span class="btn-label" id="auth-submit-label">Sign in</span>
+        <span class="spinner" aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <p class="modal-switch">
+      <span id="switch-text">New here?</span>
+      <button class="linkish" id="auth-switch">Create an account</button>
+    </p>
+  </div>
+</div>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
